@@ -1,6 +1,6 @@
 import express from "express";
-import fetch from "node-fetch";
 import cors from "cors";
+import fetch from "node-fetch";
 
 const app = express();
 app.use(cors());
@@ -12,29 +12,32 @@ app.get("/", (req, res) => {
 
 app.post("/ask", async (req, res) => {
   try {
-    const { message } = req.body;
+    const userMessage = req.body.message;
 
-    const r = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${process.env.GEMINI_API_KEY}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: message }] }]
-        })
-      }
-    );
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${process.env.GROQ_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: "llama3-8b-8192",
+        messages: [{ role: "user", content: userMessage }]
+      })
+    });
 
-    const d = await r.json();
+    const data = await response.json();
 
-    const reply =
-      d?.candidates?.[0]?.content?.parts?.[0]?.text || "No response from AI";
+    res.json({
+      reply: data.choices?.[0]?.message?.content || "No response from AI"
+    });
 
-    res.json({ reply });
-  } catch (e) {
+  } catch (error) {
     res.json({ reply: "AI Error ❌" });
   }
 });
 
 const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => console.log("Running on", PORT));
+app.listen(PORT, () => {
+  console.log("Server running on port", PORT);
+});
