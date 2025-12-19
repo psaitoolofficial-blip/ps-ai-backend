@@ -20,11 +20,7 @@ app.post("/ask", async (req, res) => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          contents: [
-            {
-              parts: [{ text: userMessage }]
-            }
-          ]
+          contents: [{ parts: [{ text: userMessage }] }]
         })
       }
     );
