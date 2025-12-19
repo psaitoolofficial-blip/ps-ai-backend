@@ -4,26 +4,40 @@
   <title>PS AI Tool</title>
 </head>
 <body>
-  <h2>PS AI Tool</h2>
+
+  <h1>PS AI Tool</h1>
 
   <input id="msg" placeholder="Type message" />
   <button onclick="send()">Send</button>
 
-  <pre id="out"></pre>
+  <p id="out"></p>
 
   <script>
     async function send() {
       const message = document.getElementById("msg").value;
+      const out = document.getElementById("out");
 
-      const res = await fetch("https://ps-ai-backend-p4ye.onrender.com/ask", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message })
-      });
+      out.innerText = "Thinking...";
 
-      const data = await res.json();
-      document.getElementById("out").innerText = data.reply;
+      try {
+        const res = await fetch(
+          "https://ps-ai-backend-p4ye.onrender.com/ask",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ message })
+          }
+        );
+
+        const data = await res.json();
+        out.innerText = data.reply;
+      } catch (e) {
+        out.innerText = "Backend se jawab nahi aaya ❌";
+      }
     }
   </script>
+
 </body>
 </html>
