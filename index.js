@@ -12,32 +12,29 @@ app.get("/", (req, res) => {
 
 app.post("/ask", async (req, res) => {
   try {
-    const userMessage = req.body.message;
+    const { message } = req.body;
 
-    const response = await fetch(
+    const r = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${process.env.GEMINI_API_KEY}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          contents: [{ parts: [{ text: userMessage }] }]
+          contents: [{ parts: [{ text: message }] }]
         })
       }
     );
 
-    const data = await response.json();
+    const d = await r.json();
 
     const reply =
-      data.candidates?.[0]?.content?.parts?.[0]?.text ||
-      "No response from AI";
+      d?.candidates?.[0]?.content?.parts?.[0]?.text || "No response from AI";
 
     res.json({ reply });
-  } catch (err) {
+  } catch (e) {
     res.json({ reply: "AI Error ❌" });
   }
 });
 
 const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => {
-  console.log("Server running on port", PORT);
-});
+app.listen(PORT, () => console.log("Running on", PORT));
